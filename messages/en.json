@@ -1,0 +1,133 @@
+{
+  "common": {
+    "appName": "Dilling",
+    "home": "Home",
+    "catalog": "Catalog",
+    "cart": "Cart",
+    "checkout": "Checkout",
+    "account": "Account",
+    "orders": "Orders",
+    "search": "Search",
+    "signIn": "Sign in",
+    "signUp": "Create account",
+    "signOut": "Sign out",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "back": "Back",
+    "next": "Next",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "language": "Language",
+    "currency": "Currency",
+    "addToCart": "Add to cart",
+    "removeFromCart": "Remove from cart",
+    "viewCart": "View cart",
+    "continueShopping": "Continue shopping",
+    "proceedToCheckout": "Proceed to checkout",
+    "emptyCart": "Your cart is empty",
+    "total": "Total",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "freeShipping": "Free shipping",
+    "quantity": "Quantity",
+    "size": "Size",
+    "color": "Color",
+    "material": "Material",
+    "price": "Price",
+    "noResults": "No results found"
+  },
+  "home": {
+    "hero": {
+      "title": "Natural materials since 1916",
+      "subtitle": "Organic merino wool and cotton for the whole family",
+      "cta": "Explore collection",
+      "chatCta": "Ask our AI assistant"
+    },
+    "categories": {
+      "women": "Women",
+      "men": "Men",
+      "children": "Children",
+      "baby": "Baby"
+    },
+    "featured": {
+      "title": "Popular products",
+      "new": "New arrivals"
+    }
+  },
+  "catalog": {
+    "title": "Catalog",
+    "filters": {
+      "gender": "Gender",
+      "material": "Material",
+      "category": "Category",
+      "priceRange": "Price range",
+      "size": "Size",
+      "sort": "Sort",
+      "clearAll": "Clear all",
+      "apply": "Apply"
+    },
+    "sort": {
+      "newest": "Newest",
+      "priceAsc": "Price: low to high",
+      "priceDesc": "Price: high to low",
+      "name": "Name"
+    },
+    "product": {
+      "addedToCart": "Added to cart",
+      "selectSize": "Select size",
+      "selectColor": "Select color",
+      "careInstructions": "Care instructions",
+      "description": "Description",
+      "details": "Details"
+    }
+  },
+  "chat": {
+    "title": "Dilling AI Assistant",
+    "placeholder": "Type a message...",
+    "greeting": "Hi! I'm Dilling's AI assistant. I can help you find the perfect clothing in natural materials. What can I help you with?",
+    "suggestions": {
+      "dressMe": "Dress me for...",
+      "findGift": "Find a gift",
+      "merinoWool": "What is merino wool?",
+      "myCart": "What's in my cart?",
+      "trackOrder": "Track my order"
+    }
+  },
+  "checkout": {
+    "title": "Checkout",
+    "paymentMethod": "Payment method",
+    "shippingAddress": "Shipping address",
+    "orderSummary": "Order summary",
+    "placeOrder": "Place order",
+    "processing": "Processing..."
+  },
+  "orders": {
+    "title": "My orders",
+    "orderNumber": "Order #",
+    "status": {
+      "PENDING": "Pending",
+      "PAID": "Paid",
+      "PROCESSING": "Processing",
+      "SHIPPED": "Shipped",
+      "DELIVERED": "Delivered",
+      "CANCELLED": "Cancelled"
+    },
+    "noOrders": "You have no orders yet"
+  },
+  "materials": {
+    "MERINO_WOOL": "Merino Wool",
+    "COTTON": "Cotton",
+    "WOOL_SILK": "Wool/Silk",
+    "CASHMERE": "Cashmere",
+    "LAMB_WOOL": "Lambswool",
+    "MERINO_FLEECE": "Merino Fleece",
+    "MERINO_TERRY": "Merino Terry"
+  },
+  "genders": {
+    "WOMEN": "Women",
+    "MEN": "Men",
+    "CHILDREN": "Children",
+    "BABY": "Baby"
+  }
+}

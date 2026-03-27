@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Next.js
+.next/
+out/
+build/
+
+# Production
+dist/
+
+# Environment
+.env
+.env.local
+.env.production.local
+.env.development.local
+
+# Prisma
+src/generated/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage/
+test-results/
+playwright-report/
+playwright-results.json
+
+# Docker
+docker-compose.override.yml
+
+# Misc
+*.log
+npm-debug.log*

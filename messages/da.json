@@ -1,0 +1,133 @@
+{
+  "common": {
+    "appName": "Dilling",
+    "home": "Hjem",
+    "catalog": "Katalog",
+    "cart": "Kurv",
+    "checkout": "Betal",
+    "account": "Konto",
+    "orders": "Ordrer",
+    "search": "Søg",
+    "signIn": "Log ind",
+    "signUp": "Opret konto",
+    "signOut": "Log ud",
+    "loading": "Indlæser...",
+    "error": "Der opstod en fejl",
+    "back": "Tilbage",
+    "next": "Næste",
+    "save": "Gem",
+    "cancel": "Annuller",
+    "close": "Luk",
+    "language": "Sprog",
+    "currency": "Valuta",
+    "addToCart": "Læg i kurv",
+    "removeFromCart": "Fjern fra kurv",
+    "viewCart": "Se kurv",
+    "continueShopping": "Fortsæt shopping",
+    "proceedToCheckout": "Gå til kassen",
+    "emptyCart": "Din kurv er tom",
+    "total": "Total",
+    "subtotal": "Subtotal",
+    "shipping": "Fragt",
+    "freeShipping": "Gratis fragt",
+    "quantity": "Antal",
+    "size": "Størrelse",
+    "color": "Farve",
+    "material": "Materiale",
+    "price": "Pris",
+    "noResults": "Ingen resultater fundet"
+  },
+  "home": {
+    "hero": {
+      "title": "Naturlige materialer siden 1916",
+      "subtitle": "Økologisk merinould og bomuld til hele familien",
+      "cta": "Udforsk kollektion",
+      "chatCta": "Spørg vores AI-assistent"
+    },
+    "categories": {
+      "women": "Dame",
+      "men": "Herre",
+      "children": "Børn",
+      "baby": "Baby"
+    },
+    "featured": {
+      "title": "Populære produkter",
+      "new": "Nyheder"
+    }
+  },
+  "catalog": {
+    "title": "Katalog",
+    "filters": {
+      "gender": "Køn",
+      "material": "Materiale",
+      "category": "Kategori",
+      "priceRange": "Prisinterval",
+      "size": "Størrelse",
+      "sort": "Sorter",
+      "clearAll": "Ryd alle",
+      "apply": "Anvend"
+    },
+    "sort": {
+      "newest": "Nyeste",
+      "priceAsc": "Pris: lav til høj",
+      "priceDesc": "Pris: høj til lav",
+      "name": "Navn"
+    },
+    "product": {
+      "addedToCart": "Tilføjet til kurv",
+      "selectSize": "Vælg størrelse",
+      "selectColor": "Vælg farve",
+      "careInstructions": "Vaskevejledning",
+      "description": "Beskrivelse",
+      "details": "Detaljer"
+    }
+  },
+  "chat": {
+    "title": "Dilling AI Assistent",
+    "placeholder": "Skriv en besked...",
+    "greeting": "Hej! Jeg er Dillings AI-assistent. Jeg kan hjælpe dig med at finde det perfekte tøj i naturlige materialer. Hvad kan jeg hjælpe med?",
+    "suggestions": {
+      "dressMe": "Klæd mig på til...",
+      "findGift": "Find en gave",
+      "merinoWool": "Hvad er merinould?",
+      "myCart": "Hvad er i min kurv?",
+      "trackOrder": "Spor min ordre"
+    }
+  },
+  "checkout": {
+    "title": "Betal",
+    "paymentMethod": "Betalingsmetode",
+    "shippingAddress": "Leveringsadresse",
+    "orderSummary": "Ordreoversigt",
+    "placeOrder": "Afgiv ordre",
+    "processing": "Behandler..."
+  },
+  "orders": {
+    "title": "Mine ordrer",
+    "orderNumber": "Ordrenr.",
+    "status": {
+      "PENDING": "Afventer",
+      "PAID": "Betalt",
+      "PROCESSING": "Behandles",
+      "SHIPPED": "Afsendt",
+      "DELIVERED": "Leveret",
+      "CANCELLED": "Annulleret"
+    },
+    "noOrders": "Du har ingen ordrer endnu"
+  },
+  "materials": {
+    "MERINO_WOOL": "Merinould",
+    "COTTON": "Bomuld",
+    "WOOL_SILK": "Uld/Silke",
+    "CASHMERE": "Kashmir",
+    "LAMB_WOOL": "Lammeuld",
+    "MERINO_FLEECE": "Merino Fleece",
+    "MERINO_TERRY": "Merino Frotté"
+  },
+  "genders": {
+    "WOMEN": "Dame",
+    "MEN": "Herre",
+    "CHILDREN": "Børn",
+    "BABY": "Baby"
+  }
+}
