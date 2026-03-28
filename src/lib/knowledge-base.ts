@@ -226,11 +226,15 @@ Dilling uses standard EU sizes. Merino wool has natural stretch — when in doub
 /**
  * Search the knowledge base by keyword matching.
  */
-export function searchKnowledgeBase(query: string): KBArticle[] {
+export function searchKnowledgeBase(
+  query: string,
+  opts?: { category?: string; limit?: number }
+): KBArticle[] {
   const lower = query.toLowerCase();
   const words = lower.split(/\s+/);
 
-  return KNOWLEDGE_BASE.filter((article) => {
+  let results = KNOWLEDGE_BASE.filter((article) => {
+    if (opts?.category && article.category !== opts.category) return false;
     const keywordMatch = article.keywords.some((kw) =>
       words.some((word) => kw.includes(word) || word.includes(kw))
     );
@@ -238,7 +242,6 @@ export function searchKnowledgeBase(query: string): KBArticle[] {
     const contentMatch = article.content.toLowerCase().includes(lower);
     return keywordMatch || titleMatch || contentMatch;
   }).sort((a, b) => {
-    // Prioritize keyword matches
     const aKeywords = a.keywords.filter((kw) =>
       words.some((word) => kw.includes(word) || word.includes(kw))
     ).length;
@@ -247,4 +250,7 @@ export function searchKnowledgeBase(query: string): KBArticle[] {
     ).length;
     return bKeywords - aKeywords;
   });
+
+  if (opts?.limit) results = results.slice(0, opts.limit);
+  return results;
 }

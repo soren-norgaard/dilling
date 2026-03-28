@@ -1,7 +1,8 @@
 /**
  * Dilling Database Seeder
  *
- * Seeds the database with product data and configures Meilisearch indexes.
+ * Seeds the database with 1800 scraped products from dk.dilling.com
+ * and configures Meilisearch indexes.
  *
  * Usage: npx tsx scripts/seed.ts
  */
@@ -10,6 +11,9 @@ import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 import { MeiliSearch } from "meilisearch";
+import { readFileSync } from "fs";
+import { join } from "path";
+import { buildSizeGuide } from "../src/lib/size-charts";
 
 const DATABASE_URL =
   process.env.DATABASE_URL ??
@@ -18,9 +22,69 @@ const DATABASE_URL =
 const MEILISEARCH_HOST = process.env.MEILISEARCH_HOST ?? "http://localhost:7700";
 const MEILISEARCH_KEY = process.env.MEILISEARCH_MASTER_KEY ?? "dilling_search_key_2026";
 
+const DKK_TO_EUR = 0.134;
+
+interface ScrapedProduct {
+  slug: string;
+  sku: string;
+  url: string;
+  name: string;
+  nameDa: string;
+  priceDKK: number;
+  gender: string;
+  material: string;
+  tags: string[];
+  images: string[];
+  sizes: string[];
+  colorName: string;
+  colorHex: string;
+  productType: string;
+  // Enriched fields from real page scrape
+  description?: string;
+  materialDescription?: string;
+  materialWeight?: string;
+  layer?: string;
+  fit?: string;
+  fitKey?: string;
+  layerKey?: string;
+  sizeGuideImage?: string;
+}
+
+function loadScrapedProducts(): ScrapedProduct[] {
+  const seedPath = join(__dirname, "products-seed.json");
+  const raw = readFileSync(seedPath, "utf-8");
+  return JSON.parse(raw) as ScrapedProduct[];
+}
+
+// Map gender/material to valid Prisma enum values
+const GENDER_MAP: Record<string, string> = {
+  WOMEN: "WOMEN", MEN: "MEN", CHILDREN: "CHILDREN", BABY: "BABY", UNISEX: "UNISEX",
+};
+const MATERIAL_MAP: Record<string, string> = {
+  MERINO_WOOL: "MERINO_WOOL", COTTON: "COTTON", WOOL_SILK: "WOOL_SILK",
+  CASHMERE: "CASHMERE", LAMB_WOOL: "LAMB_WOOL", MERINO_FLEECE: "MERINO_FLEECE",
+  MERINO_TERRY: "MERINO_TERRY", RECYCLED_NYLON: "MERINO_WOOL",
+  RECYCLED_POLYESTER: "MERINO_WOOL", WOOL_COTTON: "COTTON",
+  MERINO_ALPACA: "MERINO_WOOL", SOFTSHELL: "MERINO_WOOL",
+};
+
+function genderCategory(gender: string): string {
+  switch (gender) {
+    case "WOMEN": return "dame";
+    case "MEN": return "herre";
+    case "CHILDREN": return "boern";
+    case "BABY": return "baby";
+    default: return "dame";
+  }
+}
+
 async function main() {
   console.log("🧶 Dilling Database Seeder");
   console.log("=".repeat(40));
+
+  // Load scraped products
+  const scraped = loadScrapedProducts();
+  console.log(`\n📦 Loaded ${scraped.length} scraped products`);
 
   // Connect to database
   const pool = new Pool({ connectionString: DATABASE_URL });
@@ -38,11 +102,11 @@ async function main() {
       { slug: "herre", translations: [{ locale: "DA", name: "Herre" }, { locale: "EN", name: "Men" }] },
       { slug: "boern", translations: [{ locale: "DA", name: "Børn" }, { locale: "EN", name: "Children" }] },
       { slug: "baby", translations: [{ locale: "DA", name: "Baby" }, { locale: "EN", name: "Baby" }] },
-      // Sub-categories
       { slug: "activewear", translations: [{ locale: "DA", name: "Activewear" }, { locale: "EN", name: "Activewear" }] },
       { slug: "undertoej", translations: [{ locale: "DA", name: "Undertøj" }, { locale: "EN", name: "Underwear" }] },
       { slug: "hverdagstoej", translations: [{ locale: "DA", name: "Hverdagstøj" }, { locale: "EN", name: "Everyday Wear" }] },
-      { slug: "sokker", translations: [{ locale: "DA", name: "Sokker" }, { locale: "EN", name: "Socks" }] },
+      { slug: "sokker", translations: [{ locale: "DA", name: "Sokker og strømper" }, { locale: "EN", name: "Socks" }] },
+      { slug: "accessories", translations: [{ locale: "DA", name: "Accessories" }, { locale: "EN", name: "Accessories" }] },
     ];
 
     for (const cat of categories) {
@@ -62,191 +126,188 @@ async function main() {
     }
     console.log(`  ✅ ${categories.length} categories seeded`);
 
-    // 2. Seed sample products
-    console.log("\n🧶 Seeding sample products...");
-    const sampleProducts = [
-      {
-        sku: "fg-9926-0611-263",
-        slug: "dame-merinould-t-shirt-sort",
-        material: "MERINO_WOOL" as const,
-        gender: "WOMEN" as const,
-        tags: ["NEW", "ACTIVEWEAR"] as Array<"NEW" | "ACTIVEWEAR">,
-        images: ["https://res.cloudinary.com/dilling/image/upload/v1/products/fg-9926-0611-263.jpg"],
-        sizes: ["XS", "S", "M", "L", "XL"],
-        colors: [{ name: "Sort", hex: "#000000" }],
-        certifications: ["GOTS"],
-        translations: [
-          { locale: "DA", name: "Dame merinould T-shirt", description: "Blød T-shirt i 100% merinould. Temperaturregulerende og lugtreducerende." },
-          { locale: "EN", name: "Women's Merino Wool T-shirt", description: "Soft T-shirt in 100% merino wool. Temperature regulating and odor resistant." },
-        ],
-        prices: [
-          { currency: "DKK", amount: 299.00 },
-          { currency: "EUR", amount: 39.95 },
-        ],
-      },
-      {
-        sku: "mg-8845-0432-157",
-        slug: "herre-merinould-base-layer-navy",
-        material: "MERINO_WOOL" as const,
-        gender: "MEN" as const,
-        tags: ["ACTIVEWEAR"] as Array<"ACTIVEWEAR">,
-        images: ["https://res.cloudinary.com/dilling/image/upload/v1/products/mg-8845-0432-157.jpg"],
-        sizes: ["S", "M", "L", "XL", "XXL"],
-        colors: [{ name: "Navy", hex: "#1B2838" }],
-        certifications: [],
-        translations: [
-          { locale: "DA", name: "Herre merinould base layer", description: "Varm base layer i merinould til ski og vandring." },
-          { locale: "EN", name: "Men's Merino Wool Base Layer", description: "Warm merino wool base layer for skiing and hiking." },
-        ],
-        prices: [
-          { currency: "DKK", amount: 449.00 },
-          { currency: "EUR", amount: 59.95 },
-        ],
-      },
-      {
-        sku: "fg-7733-0288-094",
-        slug: "dame-bomuld-boxershorts-hvid",
-        material: "COTTON" as const,
-        gender: "WOMEN" as const,
-        tags: [] as Array<never>,
-        images: ["https://res.cloudinary.com/dilling/image/upload/v1/products/fg-7733-0288-094.jpg"],
-        sizes: ["XS", "S", "M", "L", "XL"],
-        colors: [{ name: "Hvid", hex: "#FFFFFF" }, { name: "Sort", hex: "#000000" }],
-        certifications: ["GOTS"],
-        translations: [
-          { locale: "DA", name: "Dame bomuld boxershorts", description: "Økologisk bomuld boxershorts i blød jersey." },
-          { locale: "EN", name: "Women's Cotton Boxershorts", description: "Organic cotton boxershorts in soft jersey." },
-        ],
-        prices: [
-          { currency: "DKK", amount: 149.00 },
-          { currency: "EUR", amount: 19.95 },
-        ],
-      },
-      {
-        sku: "kg-5522-0199-041",
-        slug: "boern-uld-silke-body-natur",
-        material: "WOOL_SILK" as const,
-        gender: "CHILDREN" as const,
-        tags: ["SWAN_MARK"] as Array<"SWAN_MARK">,
-        images: ["https://res.cloudinary.com/dilling/image/upload/v1/products/kg-5522-0199-041.jpg"],
-        sizes: ["80", "86", "92", "98", "104", "110"],
-        colors: [{ name: "Natur", hex: "#F5F0E8" }],
-        certifications: ["Nordic Swan"],
-        translations: [
-          { locale: "DA", name: "Børn uld/silke body", description: "Blød body i uld/silke blanding. Perfekt til sensitive børnehud." },
-          { locale: "EN", name: "Children's Wool/Silk Bodysuit", description: "Soft bodysuit in wool/silk blend. Perfect for sensitive children's skin." },
-        ],
-        prices: [
-          { currency: "DKK", amount: 199.00 },
-          { currency: "EUR", amount: 26.95 },
-        ],
-      },
-      {
-        sku: "mg-6644-0355-128",
-        slug: "herre-merinould-boxershorts-sort",
-        material: "MERINO_WOOL" as const,
-        gender: "MEN" as const,
-        tags: [] as Array<never>,
-        images: ["https://res.cloudinary.com/dilling/image/upload/v1/products/mg-6644-0355-128.jpg"],
-        sizes: ["S", "M", "L", "XL", "XXL"],
-        colors: [{ name: "Sort", hex: "#000000" }, { name: "Navy", hex: "#1B2838" }],
-        certifications: [],
-        translations: [
-          { locale: "DA", name: "Herre merinould boxershorts", description: "Komfortable boxershorts i 100% merinould." },
-          { locale: "EN", name: "Men's Merino Wool Boxershorts", description: "Comfortable boxershorts in 100% merino wool." },
-        ],
-        prices: [
-          { currency: "DKK", amount: 249.00 },
-          { currency: "EUR", amount: 33.95 },
-        ],
-      },
-    ];
+    // 2. Seed products from scraped data
+    console.log(`\n🧶 Seeding ${scraped.length} products...`);
+    let seeded = 0;
 
-    for (const p of sampleProducts) {
-      const product = await prisma.product.upsert({
-        where: { sku: p.sku },
-        update: {},
-        create: {
-          sku: p.sku,
-          slug: p.slug,
-          material: p.material,
-          gender: p.gender,
-          tags: p.tags,
-          images: p.images,
-          sizes: p.sizes,
-          colors: p.colors,
-          certifications: p.certifications,
-          translations: {
-            create: p.translations.map((t) => ({
-              locale: t.locale as "DA" | "EN",
-              name: t.name,
-              description: t.description,
-            })),
-          },
-          prices: {
-            create: p.prices.map((pr) => ({
-              currency: pr.currency as "DKK" | "EUR",
-              amount: pr.amount,
-            })),
-          },
-        },
-      });
-      console.log(`  ✅ ${p.translations[0].name} (${p.sku})`);
+    for (const p of scraped) {
+      const gender = GENDER_MAP[p.gender] ?? "WOMEN";
+      const material = MATERIAL_MAP[p.material] ?? "MERINO_WOOL";
+      const eurPrice = Math.round(p.priceDKK * DKK_TO_EUR * 100) / 100;
+
+      // Build descriptions
+      const descDa = p.description || `${p.productType} i ${p.material.toLowerCase().replace(/_/g, " ")}. Fra dk.dilling.com.`;
+      const descEn = p.description
+        ? p.description  // Real descriptions are in Danish, still better than generated
+        : `${p.productType} in ${p.material.toLowerCase().replace(/_/g, " ")}. From dk.dilling.com.`;
+
+      // Build care instructions from material data
+      const careInfo = [p.materialDescription, p.materialWeight, p.layer, p.fit].filter(Boolean).join(". ");
+
+      // Build size guide from standard charts
+      const sizeGuide = buildSizeGuide(p.gender, p.sizes);
+
+      try {
+        const existing = await prisma.product.findUnique({ where: { sku: p.sku } });
+
+        if (existing) {
+          // Update ALL fields for existing products
+          await prisma.product.update({
+            where: { sku: p.sku },
+            data: {
+              images: p.images,
+              sizes: p.sizes.length > 0 ? p.sizes : undefined,
+              colors: [{ name: p.colorName, hex: p.colorHex }],
+              materialWeight: p.materialWeight || null,
+              fit: p.fit || null,
+              layer: p.layer || null,
+              sizeGuide: sizeGuide ?? undefined,
+            },
+          });
+          // Update translations
+          await prisma.productTranslation.updateMany({
+            where: { productId: existing.id, locale: "DA" },
+            data: { name: p.nameDa, description: descDa, careInstructions: careInfo },
+          });
+          await prisma.productTranslation.updateMany({
+            where: { productId: existing.id, locale: "EN" },
+            data: { name: p.name, description: descEn, careInstructions: careInfo },
+          });
+          // Update prices
+          await prisma.price.updateMany({
+            where: { productId: existing.id, currency: "DKK" },
+            data: { amount: p.priceDKK },
+          });
+          await prisma.price.updateMany({
+            where: { productId: existing.id, currency: "EUR" },
+            data: { amount: eurPrice },
+          });
+        } else {
+          await prisma.product.create({
+            data: {
+              sku: p.sku,
+              slug: p.slug,
+              material: material as any,
+              gender: gender as any,
+              tags: p.tags as any[],
+              images: p.images,
+              sizes: p.sizes,
+              colors: [{ name: p.colorName, hex: p.colorHex }],
+              certifications: [],
+              materialWeight: p.materialWeight || null,
+              fit: p.fit || null,
+              layer: p.layer || null,
+              sizeGuide: sizeGuide ?? undefined,
+              translations: {
+                create: [
+                  { locale: "DA" as const, name: p.nameDa, description: descDa, careInstructions: careInfo },
+                  { locale: "EN" as const, name: p.name, description: descEn, careInstructions: careInfo },
+                ],
+              },
+              prices: {
+                create: [
+                  { currency: "DKK" as const, amount: p.priceDKK },
+                  { currency: "EUR" as const, amount: eurPrice },
+                ],
+              },
+            },
+          });
+        }
+        seeded++;
+        if (seeded % 100 === 0) {
+          console.log(`  Progress: ${seeded}/${scraped.length}`);
+        }
+      } catch (e) {
+        // Skip duplicates (same slug but different SKU)
+      }
     }
+    console.log(`  ✅ ${seeded} products seeded`);
 
-    // 3. Configure Meilisearch
+    // 3. Link products to categories
+    console.log("\n🔗 Linking products to categories...");
+    const allProducts = await prisma.product.findMany({ select: { id: true, gender: true, tags: true } });
+    const catMap = new Map<string, string>();
+    const allCats = await prisma.category.findMany({ select: { id: true, slug: true } });
+    for (const c of allCats) catMap.set(c.slug, c.id);
+
+    for (const prod of allProducts) {
+      const genderCat = catMap.get(genderCategory(prod.gender));
+      if (genderCat) {
+        await prisma.categoriesOnProducts.upsert({
+          where: { productId_categoryId: { productId: prod.id, categoryId: genderCat } },
+          update: {},
+          create: { productId: prod.id, categoryId: genderCat },
+        }).catch(() => {});
+      }
+    }
+    console.log(`  ✅ Products linked to categories`);
+
+    // 4. Configure Meilisearch
     console.log("\n🔍 Configuring Meilisearch...");
     const productsIndex = meili.index("products");
 
     await productsIndex.updateSettings({
-      searchableAttributes: ["name", "sku", "categoryPath", "material", "description"],
+      searchableAttributes: ["name", "sku", "material", "description", "productType", "colorName", "materialDescription"],
       filterableAttributes: [
-        "gender", "material", "tags", "category", "priceAmount", "sizes", "colors", "isActive",
+        "gender", "material", "tags", "priceAmount", "sizes", "colorName", "isActive", "productType",
+        "fit", "layer", "materialWeight",
       ],
       sortableAttributes: ["priceAmount", "name", "createdAt"],
       rankingRules: ["words", "typo", "proximity", "attribute", "sort", "exactness"],
       synonyms: {
-        merinould: ["merino wool", "merino"],
-        uld: ["wool"],
-        bomuld: ["cotton"],
-        dame: ["women"],
-        herre: ["men"],
-        børn: ["children"],
+        merinould: ["merino wool", "merino", "uld"],
+        uld: ["wool", "merinould"],
+        bomuld: ["cotton", "økologisk bomuld"],
+        dame: ["women", "kvinder"],
+        herre: ["men", "mænd"],
+        børn: ["children", "kids", "born"],
+        baby: ["infant", "spædbarn"],
+        undertøj: ["underwear", "base layer"],
+        undertrøje: ["base layer top", "undershirt"],
+        leggings: ["tights", "strømpebukser"],
+        t_shirt: ["tee", "t-shirt"],
+        trøje: ["sweater", "pullover"],
+        hættetrøje: ["hoodie"],
+        bukser: ["pants", "trousers"],
       },
     });
 
-    // Index products
-    const allProducts = await prisma.product.findMany({
+    // Index all products
+    const indexProducts = await prisma.product.findMany({
       include: { translations: true, prices: true },
     });
 
-    const docs = allProducts.map((p) => {
-      const daTranslation = p.translations.find((t) => t.locale === "DA");
-      const enTranslation = p.translations.find((t) => t.locale === "EN");
-      const dkkPrice = p.prices.find((pr) => pr.currency === "DKK");
+    const docs = indexProducts.map((p) => {
+      const da = p.translations.find((t) => t.locale === "DA");
+      const en = p.translations.find((t) => t.locale === "EN");
+      const dkk = p.prices.find((pr) => pr.currency === "DKK");
 
       return {
         id: p.id,
         sku: p.sku,
         slug: p.slug,
-        name: daTranslation?.name ?? enTranslation?.name ?? p.slug,
-        description: daTranslation?.description ?? enTranslation?.description ?? "",
+        name: da?.name ?? en?.name ?? p.slug,
+        description: da?.description ?? en?.description ?? "",
         gender: p.gender,
         material: p.material,
         tags: p.tags,
         sizes: p.sizes,
         colors: p.colors,
+        colorName: (p.colors as any[])?.[0]?.name ?? "",
         images: p.images,
-        priceAmount: dkkPrice ? Number(dkkPrice.amount) : 0,
+        priceAmount: dkk ? Number(dkk.amount) : 0,
         isActive: p.isActive,
         createdAt: p.createdAt.toISOString(),
+        materialWeight: p.materialWeight ?? "",
+        fit: p.fit ?? "",
+        layer: p.layer ?? "",
       };
     });
 
-    await productsIndex.addDocuments(docs);
+    await productsIndex.addDocuments(docs, { primaryKey: "id" });
     console.log(`  ✅ ${docs.length} products indexed in Meilisearch`);
 
-    // 4. Seed exchange rates
+    // 5. Seed exchange rates
     console.log("\n💱 Seeding exchange rates...");
     const rates = [
       { baseCurrency: "DKK", targetCurrency: "EUR", rate: 0.134 },

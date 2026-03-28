@@ -65,7 +65,7 @@ export default function CartPage() {
                               ? updateQuantity(item.productId, item.size, item.color, item.quantity - 1)
                               : removeItem(item.productId, item.size, item.color)
                           }
-                          className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-sm hover:bg-surface"
+                          className="flex h-10 w-10 items-center justify-center rounded-lg border border-border text-sm hover:bg-surface"
                         >
                           −
                         </button>
@@ -74,7 +74,7 @@ export default function CartPage() {
                           onClick={() =>
                             updateQuantity(item.productId, item.size, item.color, item.quantity + 1)
                           }
-                          className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-sm hover:bg-surface"
+                          className="flex h-10 w-10 items-center justify-center rounded-lg border border-border text-sm hover:bg-surface"
                         >
                           +
                         </button>

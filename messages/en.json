@@ -83,14 +83,14 @@
     }
   },
   "chat": {
-    "title": "Dilling AI Assistant",
-    "placeholder": "Type a message...",
-    "greeting": "Hi! I'm Dilling's AI assistant. I can help you find the perfect clothing in natural materials. What can I help you with?",
+    "title": "Your Personal Stylist",
+    "placeholder": "What are you looking for?",
+    "greeting": "Hi! I'm your personal stylist at Dilling. I know all our materials, sizes and can put together the perfect outfit for you. Tell me what you need!",
     "suggestions": {
       "dressMe": "Dress me for...",
       "findGift": "Find a gift",
       "merinoWool": "What is merino wool?",
-      "myCart": "What's in my cart?",
+      "myCart": "My cart",
       "trackOrder": "Track my order"
     }
   },

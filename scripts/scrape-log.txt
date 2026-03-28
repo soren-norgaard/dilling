@@ -1,0 +1,31 @@
+🧶 Dilling Full Product Scraper
+==================================================
+
+📦 Phase 1: Scraping category pages...
+
+📄 Scraping: https://dk.dilling.com/kategori/dame?page=1
+  → 0 new products (0 total)
+📄 Scraping: https://dk.dilling.com/kategori/herre?page=1
+  → 0 new products (0 total)
+📄 Scraping: https://dk.dilling.com/kategori/boern?page=1
+  ✗ 404 for https://dk.dilling.com/kategori/boern?page=1
+📄 Scraping: https://dk.dilling.com/kategori/baby?page=1
+  → 0 new products (0 total)
+
+✅ Phase 1 complete: 0 unique products found
+
+🔍 Phase 2: Scraping product detail pages...
+
+
+✅ Phase 2 complete: 0 products with details
+
+📊 Stats:
+  Total: 0
+  By gender: {}
+  By material: {}
+  With description: 0
+  With sizes: 0
+  Price range: Infinity–-Infinity DKK
+
+💾 Written to scripts/products-scraped.json
+💾 Written seed data to scripts/products-seed.json

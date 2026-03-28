@@ -83,14 +83,14 @@
     }
   },
   "chat": {
-    "title": "Dilling AI Assistent",
-    "placeholder": "Skriv en besked...",
-    "greeting": "Hej! Jeg er Dillings AI-assistent. Jeg kan hjælpe dig med at finde det perfekte tøj i naturlige materialer. Hvad kan jeg hjælpe med?",
+    "title": "Din Personlige Stylist",
+    "placeholder": "Hvad leder du efter?",
+    "greeting": "Hej! Jeg er din personlige stylist hos Dilling. Jeg kender alle vores materialer, størrelser og kan sammensætte det perfekte outfit til dig. Fortæl mig hvad du har brug for!",
     "suggestions": {
       "dressMe": "Klæd mig på til...",
       "findGift": "Find en gave",
       "merinoWool": "Hvad er merinould?",
-      "myCart": "Hvad er i min kurv?",
+      "myCart": "Min kurv",
       "trackOrder": "Spor min ordre"
     }
   },

@@ -10,7 +10,7 @@ export default function AccountPage() {
   const links = [
     { href: "/orders", label: tc("orders"), icon: "📦" },
     { href: "/catalog", label: tc("catalog"), icon: "🛍️" },
-    { href: "/chat", label: "AI Assistent", icon: "💬" },
+    { href: "/chat", label: "Personlig Stylist", icon: "👗" },
   ];
 
   return (

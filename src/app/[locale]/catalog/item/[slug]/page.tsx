@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
+import { DillingImage } from "@/components/ui/dilling-image";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +23,10 @@ interface ProductDetail {
   sizes: string[];
   colors: { name: string; hex: string }[];
   certifications: string[];
+  sizeGuide: Record<string, Record<string, string>> | null;
+  materialWeight: string | null;
+  layer: string | null;
+  fit: string | null;
   translations: { locale: string; name: string; description: string; careInstructions: string }[];
   prices: { currency: string; amount: number | string }[];
   categories: { category: { translations: { locale: string; name: string }[] } }[];
@@ -39,6 +44,7 @@ export default function ProductDetailPage() {
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedImage, setSelectedImage] = useState(0);
   const [added, setAdded] = useState(false);
+  const [showSizeGuide, setShowSizeGuide] = useState(false);
   const addItem = useCartStore((s) => s.addItem);
   const openCart = useCartStore((s) => s.openCart);
 
@@ -116,7 +122,7 @@ export default function ProductDetailPage() {
         <div className="flex flex-col gap-3">
           <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-surface">
             {product.images.length > 0 ? (
-              <Image
+              <DillingImage
                 src={product.images[selectedImage]}
                 alt={translation?.name ?? ""}
                 fill
@@ -140,7 +146,7 @@ export default function ProductDetailPage() {
                     i === selectedImage ? "border-brand-primary" : "border-border"
                   }`}
                 >
-                  <Image src={img} alt="" fill sizes="64px" className="object-cover" />
+                  <DillingImage src={img} alt="" fill sizes="64px" className="object-cover" />
                 </button>
               ))}
             </div>
@@ -181,10 +187,41 @@ export default function ProductDetailPage() {
             </div>
           )}
 
+          {/* Product attributes */}
+          {(product.fit || product.layer || product.materialWeight) && (
+            <div className="flex flex-wrap gap-2">
+              {product.layer && (
+                <span className="inline-flex items-center gap-1 rounded-md bg-surface px-2.5 py-1 text-xs text-brand-accent border border-border">
+                  🧶 {product.layer}
+                </span>
+              )}
+              {product.fit && (
+                <span className="inline-flex items-center gap-1 rounded-md bg-surface px-2.5 py-1 text-xs text-brand-accent border border-border">
+                  📐 Pasform: {product.fit}
+                </span>
+              )}
+              {product.materialWeight && (
+                <span className="inline-flex items-center gap-1 rounded-md bg-surface px-2.5 py-1 text-xs text-brand-accent border border-border">
+                  ⚖️ {product.materialWeight}
+                </span>
+              )}
+            </div>
+          )}
+
           {/* Size selector */}
           {product.sizes.length > 0 && (
             <div>
-              <h2 className="text-sm font-semibold text-foreground">{tc("size")}</h2>
+              <div className="flex items-center justify-between">
+                <h2 className="text-sm font-semibold text-foreground">{tc("size")}</h2>
+                {product.sizeGuide && (
+                  <button
+                    onClick={() => setShowSizeGuide(!showSizeGuide)}
+                    className="text-xs font-medium text-brand-primary hover:underline"
+                  >
+                    {showSizeGuide ? "Skjul størrelsesguide" : "Størrelsesguide"}
+                  </button>
+                )}
+              </div>
               <div className="mt-2 flex flex-wrap gap-2">
                 {product.sizes.map((size) => (
                   <button
@@ -200,6 +237,62 @@ export default function ProductDetailPage() {
                   </button>
                 ))}
               </div>
+
+              {/* Size guide table */}
+              {showSizeGuide && product.sizeGuide && (
+                <div className="mt-3 rounded-lg border border-border bg-surface p-4">
+                  <h3 className="mb-2 text-sm font-semibold text-foreground">Størrelsesguide (cm)</h3>
+                  {/* Product attributes */}
+                  <div className="mb-3 flex flex-wrap gap-x-6 gap-y-1 text-xs text-brand-accent">
+                    {product.fit && <span><strong>Pasform:</strong> {product.fit}</span>}
+                    {product.layer && <span><strong>Lag:</strong> {product.layer}</span>}
+                    {product.materialWeight && <span><strong>Materialevægt:</strong> {product.materialWeight}</span>}
+                  </div>
+                  {/* Measurement table */}
+                  {(() => {
+                    const guide = product.sizeGuide;
+                    const sizeKeys = Object.keys(guide);
+                    if (sizeKeys.length === 0) return null;
+                    const measureKeys = Object.keys(guide[sizeKeys[0]]);
+                    const labels: Record<string, string> = {
+                      chest: "Bryst", waist: "Talje", hips: "Hofte", height: "Højde",
+                    };
+                    return (
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-xs">
+                          <thead>
+                            <tr className="border-b border-border">
+                              <th className="py-1.5 pr-3 text-left font-semibold text-foreground">Str.</th>
+                              {measureKeys.map((key) => (
+                                <th key={key} className="px-2 py-1.5 text-center font-semibold text-foreground">
+                                  {labels[key] ?? key}
+                                </th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {sizeKeys.map((size) => (
+                              <tr
+                                key={size}
+                                className={`border-b border-border/50 ${
+                                  size === selectedSize ? "bg-brand-primary/10 font-medium" : ""
+                                }`}
+                              >
+                                <td className="py-1.5 pr-3 font-medium text-foreground">{size}</td>
+                                {measureKeys.map((key) => (
+                                  <td key={key} className="px-2 py-1.5 text-center text-brand-accent">
+                                    {guide[size]?.[key] ?? "—"}
+                                  </td>
+                                ))}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
             </div>
           )}
 
@@ -213,7 +306,7 @@ export default function ProductDetailPage() {
                     key={c.name}
                     onClick={() => setSelectedColor(c.name)}
                     title={c.name}
-                    className={`h-8 w-8 rounded-full border-2 transition-all ${
+                    className={`h-10 w-10 rounded-full border-2 transition-all ${
                       selectedColor === c.name
                         ? "border-brand-primary ring-2 ring-brand-primary ring-offset-2"
                         : "border-border"

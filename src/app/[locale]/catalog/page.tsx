@@ -68,7 +68,10 @@ export default function CatalogPage() {
     params.set("limit", String(PAGE_SIZE));
 
     fetch(`/api/catalog?${params.toString()}`, { signal: controller.signal })
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) return { products: [], total: 0 };
+        return res.json();
+      })
       .then((data) => {
         setProducts(data.products ?? []);
         setTotal(data.total ?? 0);

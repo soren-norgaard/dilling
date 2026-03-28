@@ -92,6 +92,10 @@ model Product {
   sizes          String[]
   colors         Json[]           // [{ name: "Blå", hex: "#1A3B5C" }]
   certifications String[]
+  sizeGuide      Json?            // { "M": { "chest": "90-94", "waist": "74-78" }, ... }
+  materialWeight String?          // e.g. "210 gr/m2"
+  layer          String?          // e.g. "Inderste lag"
+  fit            String?          // e.g. "Tæt"
   isActive       Boolean          @default(true)
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt

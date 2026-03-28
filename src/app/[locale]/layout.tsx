@@ -5,6 +5,7 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { CartDrawer } from "@/components/cart/cart-drawer";
 import { ChatPanel } from "@/components/agent/chat-panel";
+import { ShopperPanel } from "@/components/agent/shopper-panel";
 
 export default async function LocaleLayout({
   children,
@@ -36,6 +37,7 @@ export default async function LocaleLayout({
         <Footer />
         <CartDrawer />
         <ChatPanel />
+        <ShopperPanel />
       </div>
     </NextIntlClientProvider>
   );

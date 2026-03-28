@@ -35,29 +35,40 @@ export async function GET(request: NextRequest) {
     });
   } catch {
     // Fallback to Prisma
-    const where: Record<string, unknown> = { isActive: true };
-    if (gender) where.gender = gender;
-    if (material) where.material = material;
+    try {
+      const where: Record<string, unknown> = { isActive: true };
+      if (gender) where.gender = gender;
+      if (material) where.material = material;
 
-    const [products, total] = await Promise.all([
-      db.product.findMany({
-        where,
-        include: {
-          translations: { where: { locale: locale as "DA" | "EN" } },
-          prices: true,
-        },
-        skip: (page - 1) * limit,
-        take: limit,
-        orderBy: { createdAt: "desc" },
-      }),
-      db.product.count({ where }),
-    ]);
+      const [products, total] = await Promise.all([
+        db.product.findMany({
+          where,
+          include: {
+            translations: { where: { locale: locale as "DA" | "EN" } },
+            prices: true,
+          },
+          skip: (page - 1) * limit,
+          take: limit,
+          orderBy: { createdAt: "desc" },
+        }),
+        db.product.count({ where }),
+      ]);
 
-    return NextResponse.json({
-      products,
-      total,
-      page,
-      limit,
-    });
+      return NextResponse.json({
+        products,
+        total,
+        page,
+        limit,
+      });
+    } catch (dbError) {
+      console.error("Catalog DB fallback error:", dbError);
+      return NextResponse.json({
+        products: [],
+        total: 0,
+        page,
+        limit,
+        error: "Search and database are currently unavailable",
+      });
+    }
   }
 }

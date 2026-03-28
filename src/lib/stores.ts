@@ -79,3 +79,29 @@ export const useCartStore = create<CartStore>((set, get) => ({
   totalItems: () => get().items.reduce((sum, i) => sum + i.quantity, 0),
   totalPrice: () => get().items.reduce((sum, i) => sum + i.price * i.quantity, 0),
 }));
+
+/** Currency store — tracks user's preferred display currency */
+const CURRENCIES = ["DKK", "EUR", "SEK", "NOK", "GBP", "USD"] as const;
+type Currency = typeof CURRENCIES[number];
+
+interface CurrencyStore {
+  currency: Currency;
+  rates: Record<string, number>;
+  setCurrency: (currency: Currency) => void;
+  setRates: (rates: Record<string, number>) => void;
+  convert: (amountDKK: number) => number;
+  currencies: readonly string[];
+}
+
+export const useCurrencyStore = create<CurrencyStore>((set, get) => ({
+  currency: "DKK",
+  rates: { DKK: 1, EUR: 0.134, SEK: 1.54, NOK: 1.56, GBP: 0.115, USD: 0.145 },
+  currencies: CURRENCIES,
+  setCurrency: (currency) => set({ currency }),
+  setRates: (rates) => set({ rates }),
+  convert: (amountDKK) => {
+    const { currency, rates } = get();
+    const rate = rates[currency] ?? 1;
+    return Math.round(amountDKK * rate * 100) / 100;
+  },
+}));

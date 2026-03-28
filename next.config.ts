@@ -20,6 +20,11 @@ const nextConfig: NextConfig = {
         hostname: "dk.dilling.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "assets.dilling.com",
+        pathname: "/**",
+      },
     ],
   },
 };
