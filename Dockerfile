@@ -18,6 +18,9 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Install platform-specific optional deps for Alpine (musl)
+RUN npm install --no-save @parcel/watcher-linux-x64-musl @next/swc-linux-x64-musl 2>/dev/null || true
+
 # Generate Prisma client
 RUN npx prisma generate
 
