@@ -8,7 +8,8 @@ FROM node:22-slim AS deps
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm install --production=false
+RUN npm install --production=false && \
+    npm install --no-save @parcel/watcher-linux-x64-glibc 2>/dev/null || true
 
 # Stage 2: Build the application
 FROM node:22-slim AS builder
